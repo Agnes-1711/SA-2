@@ -48,8 +48,8 @@ void delay(void)
 }
 ```
 # OUTPUT:
+<img width="1920" height="1200" alt="Screenshot 2025-10-27 231323" src="https://github.com/user-attachments/assets/55f89e31-9fac-408d-a6dd-852ff5a3a9fa" />
 
-<img width="1920" height="1200" alt="Screenshot 2025-10-27 231323" src="https://github.com/user-attachments/assets/b83400a3-ae40-4b7b-9ce7-d55304fdeb5b" />
 
 # RESULT:
 
