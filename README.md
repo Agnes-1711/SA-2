@@ -1,61 +1,84 @@
 # SA-2
 
-2.Write an assembly language program in 8051 to generate a 5 second delay using Timer 0 in Mode 1 and toggle Port 2.7 continuously.
+9.Write an assembly language program in 8051 to generate a 2 second delay using Timer 0 in Mode 1 and blink an LED connected to Port 3.7.
+
 
 # AIM
 
-To develop an 8051 microcontroller assembly program that uses Timer 0 in Mode 1 to generate a 10 ms delay and toggles an LED connected to Port 2.7. 8051.
+To develop an 8051 microcontroller assembly program that uses Timer 0 in Mode 1 to generate a 2s delay using Timer 0 in mode 1 and LED connected to Port 3.7.
 
 # APPARATUS REQUIRED
-8051 Microcontroller Trainer Kit (or simulator such as Keil µVision, Proteus, or 8051 IDE).LED (connected to Port 2.7).10kΩ Resistor (current limiting resistor)
-.Connecting wires and breadboard (for hardware setup).Computer with IDE/Assembler for program development and simulation
+
+  1	       8051 Microcontroller            Used to execute the program                        
+  2	       LED	                            Connected to Port 3.7 (P3.7) to indicate blinkin   
+  3	       Resistor (330Ω – 1kΩ)           Current limiting resistor for LED                  
+  4	       Connecting wires /              For connections                                    
+             Breadboard           
+  5	       Power Supply (5V DC)            To power the 8051 circuit                          
+  6	       Keil µVision Software           For writing and simulating the assembly program    
+  7	       Proteus Software	            For circuit simulation and observation of LED                                                  blinking
 
 # ALGORITHM
+1. Start the Program
 
-Initialize Port 2 as output by writing 00H to it.Configure Timer 0 in Mode 1 (16-bit timer mode) by loading the TMOD register with 01H.Load TH0 and TL0 registers with suitable values to generate a delay of approximately 50 ms (since 5 s is too long for a single timer overflow, we will repeat the 50 ms delay 100 times).Clear TF0 (Timer 0 overflow flag) and start Timer 0 (SETB TR0).Wait until TF0 = 1 (polling).Stop Timer 0 (CLR TR0) and clear TF0 (CLR TF0).Repeat the delay loop 100 times to achieve approximately 5 seconds total delay.Toggle Port 2.7 using CPL P2.7.Go back to step 3 and repeat the process indefinitely.
+2. Initialize Port 3 as Output:
+   Configure Port 3 to connect LED on bit P3.7.
+
+3. Configure Timer 0:
+         Set Timer 0 in Mode 1 (16-bit timer mode).
+         → TMOD = 01H
+         Load the timer registers TH0 and TL0 with initial values to generate delay.
+
+4. Turn ON the LED:
+      Make P3.7 = 1.
+
+5. Call Delay Subroutine:
+        Start Timer 0 and wait until the overflow flag (TF0) is set.
+        Stop timer and clear TF0 flag.
+        Repeat timer cycle enough times to create a total 2-second delay.
+
+6. Turn OFF the LED:
+       Make P3.7 = 0.
+
+7. Call Delay Subroutine Again:
+       Delay for another 2 seconds (LED remains OFF).
+
+8. Repeat the Process Continuously (Infinite loop).
+
+9. End Program
 
 # PROGRAM
 
 ```
 ORG 0000H
 
-MAIN:   
-    MOV P2, #00H          ; Initialize Port 2 as output (all low)
+MAIN:
+    MOV TMOD, #01H      ; Timer 0, Mode 1 (16-bit)
+AGAIN:
+    CPL P3.7             ; Toggle LED
+    ACALL DELAY
+    SJMP AGAIN
 
-HERE:
-    ACALL DELAY5S         ; Call 5-second delay
-    CPL P2.7              ; Toggle bit 7 of Port 2
-    SJMP HERE             ; Repeat forever
-
-;-----------------------------
-; SUBROUTINE: 5-second delay
-;-----------------------------
-DELAY5S:
-    MOV R7, #76            ; 76 overflows × ~65.536 ms ˜ 5 sec
-
-REPEAT:
-    MOV TMOD, #01H         ; Timer 0 Mode 1 (16-bit)
-    MOV TH0, #00H          ; High byte
-    MOV TL0, #00H          ; Low byte
-    SETB TR0               ; Start Timer 0
-
-WAIT_OV:
-    JNB TF0, WAIT_OV       ; Wait until Timer 0 overflows
-    CLR TR0                ; Stop Timer
-    CLR TF0                ; Clear overflow flag
-    DJNZ R7, REPEAT        ; Repeat until 76 overflows done
-
-    RET                    ; Return to main
+DELAY:
+    MOV R7, #20          ; 20 × 100 ms = 2 seconds
+DELAY_LOOP:
+    MOV TH0, #0B1H
+    MOV TL0, #0E0H
+    SETB TR0
+WAIT:
+    JNB TF0, WAIT
+    CLR TR0
+    CLR TF0
+    DJNZ R7, DELAY_LOOP
+    RET
 
 END
 ```
 # OUTPUT:
+![WhatsApp Image 2025-11-03 at 11 18 41_8c074218](https://github.com/user-attachments/assets/59524781-d946-4e66-8cee-75bb15062966)
 
-![WhatsApp Image 2025-10-27 at 20 44 33_af233862](https://github.com/user-attachments/assets/a1ae418a-bffa-44b3-a237-e2952edfd91e)
-
-![WhatsApp Image 2025-10-27 at 20 45 00_8f6eb105](https://github.com/user-attachments/assets/7490fd43-4169-46e0-b459-294780041d5f)
 
 
 # RESULT:
 
-Successfully designed and verified an 8051 Assembly program to toggle an LED at Port 2.7 with a precise 5s interval using Timer 0 in Mode 1. Demonstrated timer initialization, delay loop, and I/O port manipulation in 8051 Assembly.
+Successfully designed and verified an 8051 Assembly program to blink an LED at Port 3.7 with a precise 2s interval using Timer 0 in Mode 1. Demonstrated timer initialization, delay loop, and I/O port manipulation in 8051 Assembly.
